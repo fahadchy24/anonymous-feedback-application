@@ -1,0 +1,3 @@
+user_id|name|email|password
+1|Fahad|fahadchy24@gmail.com|12345678
+2|John|john@doe.com|password
