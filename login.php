@@ -1,3 +1,91 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION['user_id'])) {
+    header('Location:dashboard.php');
+    exit;
+}
+
+require "helpers.php";
+
+$errors = [];
+
+$user_id = $name = $email = $password = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userEmail = $_POST['email'];
+    $password = $_POST['password'];
+    $userlist = file('users.txt');
+
+    // Validate and Sanitize Email Field
+    if (empty($_POST['email'])) {
+        $errors['email'] = 'Please provide an email address';
+    } else {
+        $email = sanitize($_POST['email']);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Pkease provide a valid email address';
+        }
+    }
+
+    // Validate and Sanitize Password Field
+    if (empty($_POST['password'])) {
+        $errors['password'] = 'Please provide a password';
+    } elseif (strlen($_POST['password']) < 8) {
+        $errors['password'] = 'Password must be 8 characters long.';
+    } else {
+        $password = sanitize($_POST['password']);
+    }
+
+    $success = false;
+    if (empty($errors)) {
+        foreach ($userlist as $user) {
+            $user_details = explode('|', $user);
+            if ($user_details[2] == $userEmail && $user_details[3] == $password) {
+                $success = true;
+                $user_id = $user_details[0];
+                $name = $user_details[1];
+                $email = $user_details[2];
+                break;
+            }
+        }
+
+
+        if ($success) {
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['name'] = $name;
+            header('Location:dashboard.php');
+            exit;
+        } else {
+            $errors['auth_error'] = 'Invalid email or password';
+        }
+    }
+
+    // $success = false;
+    // foreach ($userlist as $user) {
+    //     $user_details = explode('|', $user);
+    //     if ($user_details[2] == $userEmail && $user_details[3] == $password) {
+    //         $success = true;
+    //         $user_id = $user_details[0];
+    //         $name = $user_details[1];
+    //         $email = $user_details[2];
+    //         break;
+    //     }
+    // }
+
+    // if ($success) {
+    //     $_SESSION['user_id'] = $user_id;
+    //     $_SESSION['name'] = $name;
+    //     header('Location:dashboard.php');
+    //     exit;
+    // } else {
+    //     $errors['auth_error'] = 'Invalid email or password';
+    // }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +93,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TruthWhisper - Anonymous Feedback App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -63,13 +151,20 @@
             <div class="absolute inset-0 bg-[url(./images/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
             <div class="relative bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
                 <div class="mx-auto max-w-xl">
+
+                    <?php if (isset($errors['auth_error'])) : ?>
+                        <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
+                            <span class="font-bold"><?= $errors['auth_error']; ?></span>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                         <div class="mx-auto w-full max-w-xl text-center px-24">
                             <h1 class="block text-center font-bold text-2xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</h1>
                         </div>
 
                         <div class="mt-10 mx-auto w-full max-w-xl">
-                            <form class="space-y-6" action="#" method="POST">
+                            <form class="space-y-6" action="" method="POST" novalidate>
                                 <div>
                                     <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                                     <div class="mt-2">

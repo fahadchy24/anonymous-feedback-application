@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location:login.php');
+    exit;
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +15,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TruthWhisper - Anonymous Feedback App</title>
+    <!-- Tailwindcss CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AlpineJS CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -25,8 +38,18 @@
                     </svg>
                 </button>
             </div>
-            <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-                <span class="text-sm font-semibold leading-6 text-gray-900">John Doe</span>
+            <div class="hidden lg:flex lg:flex-1 lg:justify-end relative" x-data="{ open: false }">
+                <div>
+                    <button @click="open = !open" type="button" class="flex rounded-full bg-white text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                        <span class="sr-only">Open user menu</span>
+                        <span class="text-sm font-semibold leading-6 text-gray-900"><?= $_SESSION['name']; ?></span>
+                        </span>
+                    </button>
+                </div>
+                <!-- Dropdown menu -->
+                <div x-show="open" @click.away="open = false" class="absolute right-0 z-10 mt-6 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                    <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                </div>
             </div>
         </nav>
         <!-- Mobile menu, show/hide based on menu open state. -->
@@ -47,9 +70,18 @@
                     </button>
                 </div>
                 <div class="mt-6 flow-root">
-                    <div class="-my-6 divide-y divide-gray-500/10">
+                    <div class="-my-6 divide-y divide-gray-500/10" x-data="{ open: false }">
                         <div class="py-6">
-                            <span class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">John Doe</span>
+                            <div class="relative">
+                                <button @click="open = !open" type="button" class="flex rounded-full bg-white text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                    <span class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"><?= $_SESSION['name']; ?></span>
+                                    </span>
+                                </button>
+                            </div>
+                            <!-- Dropdown menu -->
+                            <div x-show="open" @click.away="open = false" class="absolute left-0 z-10 mt-1 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -102,7 +134,6 @@
             <p class="text-center text-xs leading-5 text-gray-500">&copy; 2024 TruthWhisper, Inc. All rights reserved.</p>
         </div>
     </footer>
-
 </body>
 
 </html>
