@@ -18,26 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     $userlist = file('users.txt');
 
-    // Validate and Sanitize Email Field
-    if (empty($_POST['email'])) {
-        $errors['email'] = 'Please provide an email address';
-    } else {
-        $email = sanitize($_POST['email']);
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = 'Pkease provide a valid email address';
-        }
-    }
-
-    // Validate and Sanitize Password Field
-    if (empty($_POST['password'])) {
-        $errors['password'] = 'Please provide a password';
-    } elseif (strlen($_POST['password']) < 8) {
-        $errors['password'] = 'Password must be 8 characters long.';
-    } else {
-        $password = sanitize($_POST['password']);
-    }
-
     $success = false;
     if (empty($errors)) {
         foreach ($userlist as $user) {
@@ -61,27 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['auth_error'] = 'Invalid email or password';
         }
     }
-
-    // $success = false;
-    // foreach ($userlist as $user) {
-    //     $user_details = explode('|', $user);
-    //     if ($user_details[2] == $userEmail && $user_details[3] == $password) {
-    //         $success = true;
-    //         $user_id = $user_details[0];
-    //         $name = $user_details[1];
-    //         $email = $user_details[2];
-    //         break;
-    //     }
-    // }
-
-    // if ($success) {
-    //     $_SESSION['user_id'] = $user_id;
-    //     $_SESSION['name'] = $name;
-    //     header('Location:dashboard.php');
-    //     exit;
-    // } else {
-    //     $errors['auth_error'] = 'Invalid email or password';
-    // }
 }
 
 ?>
@@ -93,11 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TruthWhisper - Anonymous Feedback App</title>
+    <!-- Tailwindcss CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <!-- AlpineJS CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100">
-    <header class="bg-white">
+    <header class="bg-white" x-data="{ mobileMenuOpen: false }">
         <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
             <div class="flex lg:flex-1">
                 <a href="index.php" class="-m-1.5 p-1.5">
@@ -106,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </a>
             </div>
             <div class="flex lg:hidden">
-                <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" @click.away="mobileMenuOpen = false" type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700" aria-controls="mobile-menu">
                     <span class="sr-only">Open main menu</span>
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <svg x-show="!mobileMenuOpen" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                     </svg>
                 </button>
@@ -118,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </nav>
         <!-- Mobile menu, show/hide based on menu open state. -->
-        <div class="lg:hidden" role="dialog" aria-modal="true">
+        <div class="lg:hidden" role="dialog" aria-modal="true" x-show="mobileMenuOpen">
             <!-- Background backdrop, show/hide based on slide-over state. -->
             <div class="fixed inset-0 z-10"></div>
             <div class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
@@ -127,9 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <span class="sr-only">TruthWhisper</span>
                         <span class="block font-bold text-xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</span>
                     </a>
-                    <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700">
                         <span class="sr-only">Close menu</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <svg x-show="mobileMenuOpen" x-cloak class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
