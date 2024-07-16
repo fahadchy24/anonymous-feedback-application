@@ -16,18 +16,17 @@ $user_id = $name = $email = $password = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userEmail = $_POST['email'];
     $password = $_POST['password'];
-    $userlist = file('users.txt');
+    $userlist = json_decode(file_get_contents("./users.json"), true);
 
     $success = false;
     if (empty($errors)) {
         foreach ($userlist as $user) {
-            $user_details = explode('|', $user);
-            if ($user_details[2] == $userEmail && $user_details[3] == $password) {
+            if ($user['email'] == $userEmail && $user['password'] == $password) {
                 $success = true;
-                $user_id = $user_details[0];
-                $name = $user_details[1];
-                $email = $user_details[2];
-                $feedback_url = $user_details[4];
+                $user_id = $user['id'];
+                $name = $user['name'];
+                $email = $user['email'];
+                $feedback_url = $user['feedback_url'];
                 break;
             }
         }

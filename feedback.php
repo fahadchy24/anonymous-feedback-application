@@ -7,14 +7,23 @@ $errors = [];
 
 $message = '';
 
+$userName = '';
+
 if (!isset($_SESSION['feedback_url'])) {
     header('Location:index.php');
     exit;
 }
 
+$userlist = json_decode(file_get_contents("./users.json"), true);
+
+foreach ($userlist as $user) {
+    if ($user['feedback_url'] == $_SESSION['feedback_url']) {
+        $userName = $user['name'];
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Validate and Sanitize Email Field
     if (empty($_POST['feedback'])) {
         $errors['error'] = 'Please provide a message.';
     } else {
@@ -41,14 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!file_put_contents("feedback.json", $encoded_data, LOCK_EX)) {
             $errors['error'] = "Error storing message, please try again";
         } else {
-            flash('success', 'Message is sent successfully.');
+            flash('success', 'Feedback sent successfully.');
         }
     }
 }
-
-
-
-
 
 ?>
 <!DOCTYPE html>
@@ -119,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                         <div class="mx-auto w-full max-w-xl text-center">
                             <h1 class="block text-center font-bold text-2xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</h1>
-                            <h3 class="text-gray-500 my-2">Want to ask something or share a feedback to "John Doe"?</h3>
+                            <h3 class="text-gray-500 my-2">Want to ask something or share a feedback to "<?= $userName; ?>"?</h3>
                         </div>
 
                         <div class="mt-10 mx-auto w-full max-w-xl">
