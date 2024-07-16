@@ -2,7 +2,7 @@
 
 session_start();
 
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION['email'])) {
     header('Location:dashboard.php');
     exit;
 }
@@ -11,36 +11,59 @@ require "helpers.php";
 
 $errors = [];
 
-$user_id = $name = $email = $password = '';
+$name = $email = $password = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $userEmail = $_POST['email'];
-    $password = $_POST['password'];
     $userlist = json_decode(file_get_contents("./users.json"), true);
 
-    $success = false;
+    // Validate and Sanitize Email Field
+    if (empty($_POST['email'])) {
+        $errors['email'] = 'Please provide an email address';
+    } else {
+        $email = sanitize($_POST['email']);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Pkease provide a valid email address';
+        }
+    }
+
+    // Validate and Sanitize Password Field
+    if (empty($_POST['password'])) {
+        $errors['password'] = 'Please provide a password';
+    } elseif (strlen($_POST['password']) < 8) {
+        $errors['password'] = 'Password must be 8 characters long.';
+    } else {
+        $password = sanitize($_POST['password']);
+    }
+
     if (empty($errors)) {
         foreach ($userlist as $user) {
-            if ($user['email'] == $userEmail && $user['password'] == $password) {
-                $success = true;
-                $user_id = $user['id'];
-                $name = $user['name'];
-                $email = $user['email'];
-                $feedback_url = $user['feedback_url'];
-                break;
+            if ($user['email'] == $email && password_verify($password, $user['password'])) {
+
+                // $success = true;
+                // $name = $user['name'];
+                // $email = $user['email'];
+                // $feedback_url = $user['feedback_url'];
+                // break;
+
+                $_SESSION['name'] = $user['name'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['feedback_url'] = $user['feedback_url'];
+                header('Location:dashboard.php');
+                exit;
+            } else {
+                $errors['auth_error'] = 'The email or password is wrong';
             }
         }
 
-
-        if ($success) {
-            $_SESSION['user_id'] = $user_id;
-            $_SESSION['name'] = $name;
-            $_SESSION['feedback_url'] = $feedback_url;
-            header('Location:dashboard.php');
-            exit;
-        } else {
-            $errors['auth_error'] = 'Invalid email or password';
-        }
+        // if ($success) {
+        //     $_SESSION['name'] = $name;
+        //     $_SESSION['feedback_url'] = $feedback_url;
+        //     header('Location:dashboard.php');
+        //     exit;
+        // } else {
+        //     $errors['auth_error'] = 'Invalid email or password';
+        // }
     } else {
         $errors['auth_error'] = 'Something went wrong';
     }
@@ -116,6 +139,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="absolute inset-0 bg-[url(./images/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
             <div class="relative bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
                 <div class="mx-auto max-w-xl">
+
+                    <?php
+                    $message = flash('success');
+                    if ($message) :
+                    ?>
+                        <div class="mt-2 bg-teal-500 text-sm text-white rounded-lg p-4" role="alert">
+                            <span class="font-bold">
+                                <?= $message; ?>
+                            </span>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if (isset($errors['auth_error'])) : ?>
                         <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">

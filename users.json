@@ -1,16 +1,8 @@
 [
     {
-        "id": 1,
-        "name": "Fahad Chowdhury",
-        "email": "fahadchy24@gmail.com",
-        "password": "password",
-        "feedback_url": "sYu24j2"
-    },
-    {
-        "id": 2,
-        "name": "John Doe",
-        "email": "john@doe.com",
-        "password": "12345678",
-        "feedback_url": "sYu24jl"
+        "name": "Admin",
+        "email": "admin@admin.com",
+        "password": "$2y$10$Ldalika.l\/ffZqR\/T.Z9RuP8WYlYDMRuxPAC4lODBQ8.vDyTeeDQ2",
+        "feedback_url": "y9jFIuw"
     }
 ]

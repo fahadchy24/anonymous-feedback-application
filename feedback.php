@@ -1,7 +1,13 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['feedback_url'])) {
+    header('Location:index.php');
+    exit;
+}
+
 require "helpers.php";
+
 
 $errors = [];
 
@@ -9,16 +15,14 @@ $message = '';
 
 $userName = '';
 
-if (!isset($_SESSION['feedback_url'])) {
-    header('Location:index.php');
-    exit;
-}
-
 $userlist = json_decode(file_get_contents("./users.json"), true);
 
 foreach ($userlist as $user) {
     if ($user['feedback_url'] == $_SESSION['feedback_url']) {
         $userName = $user['name'];
+    } else {
+        header('Location:index.php');
+        exit;
     }
 }
 

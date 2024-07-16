@@ -1,3 +1,74 @@
+<?php
+session_start();
+
+require "helpers.php";
+require "functions.php";
+
+$errors = [];
+
+$name = $email = $password = '';
+
+// Check whether the form submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validate and Sanitize Name Field
+    if (empty($_POST['name'])) {
+        $errors['name'] = 'Please provide a name';
+    } else {
+        $name = sanitize($_POST['name']);
+    }
+
+    // Validate and Sanitize Email Field
+    if (empty($_POST['email'])) {
+        $errors['email'] = 'Please provide an email address';
+    } else {
+        $email = sanitize($_POST['email']);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Please provide a valid email address';
+        }
+    }
+
+    // Validate and Sanitize Password Field
+    if (empty($_POST['password'])) {
+        $errors['password'] = 'Please provide a password';
+    } elseif (strlen($_POST['password']) < 8) {
+        $errors['password'] = 'Password must be 8 characters long.';
+    } else {
+        $password = sanitize($_POST['password']);
+
+        $password = password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    if (empty($errors)) {
+
+        $new_user = [
+            "name" => $name,
+            "email" => $email,
+            "password" => $password,
+            "feedback_url" => generateRandomString()
+        ];
+
+        if (filesize("users.json") == 0) {
+            $first_record = array($new_user);
+            $data_to_save = $first_record;
+        } else {
+            $existing_users = json_decode(file_get_contents("users.json"));
+            array_push($existing_users, $new_user);
+            $data_to_save = $existing_users;
+        }
+
+        $encoded_data = json_encode($data_to_save, JSON_PRETTY_PRINT);
+
+        if (!file_put_contents("users.json", $encoded_data, LOCK_EX)) {
+            $errors['auth_error'] = "Failed to register, please try again";
+        } else {
+            flash('success', 'Account Registered Successfully, Please Log In.');
+            header('Location:login.php');
+        }
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -75,7 +146,7 @@
                         </div>
 
                         <div class="mt-10 mx-auto w-full max-w-xl">
-                            <form class="space-y-6" action="#" method="POST">
+                            <form class="space-y-6" action="" method="POST" novalidate>
                                 <div>
                                     <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Name</label>
                                     <div class="mt-2">
