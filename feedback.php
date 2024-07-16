@@ -54,7 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!file_put_contents("feedback.json", $encoded_data, LOCK_EX)) {
             $errors['error'] = "Error storing message, please try again";
         } else {
-            flash('success', 'Feedback sent successfully.');
+            $_SESSION['success_message'] = true;
+            header('Location:feedback-success.php');
         }
     }
 }

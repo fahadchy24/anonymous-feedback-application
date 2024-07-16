@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['success_message'])) {
+    header('Location:index.php');
+    exit;
+}
+
+// Taking current system Time 
+$_SESSION['start'] = time();
+
+// Destroying session after 1 minute 
+$_SESSION['expire'] = $_SESSION['start'] + (1 * 10);
+
+session_destroy();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

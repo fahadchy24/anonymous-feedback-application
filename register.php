@@ -140,6 +140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="absolute inset-0 bg-[url(./images/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
             <div class="relative bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
                 <div class="mx-auto max-w-xl">
+                    <?php if (isset($errors['auth_error'])) : ?>
+                        <div class="mt-2 bg-red-500 text-sm text-white rounded-lg p-4" role="alert">
+                            <span class="font-bold"><?= $errors['auth_error']; ?></span>
+                        </div>
+                    <?php endif; ?>
                     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                         <div class="mx-auto w-full max-w-xl text-center px-24">
                             <h1 class="block text-center font-bold text-2xl bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">TruthWhisper</h1>
@@ -152,6 +157,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="mt-2">
                                         <input id="name" name="name" type="text" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                     </div>
+                                    <?php if (isset($errors['name'])) : ?>
+                                        <p class="text-xs text-red-600 mt-2" id="name-error">
+                                            <?php echo $errors['name']; ?>
+                                        </p>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div>
@@ -159,6 +169,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="mt-2">
                                         <input id="email" name="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                     </div>
+                                    <?php if (isset($errors['email'])) : ?>
+                                        <p class="text-xs text-red-600 mt-2" id="name-error">
+                                            <?php echo $errors['email']; ?>
+                                        </p>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div>
@@ -168,6 +183,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="mt-2">
                                         <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                     </div>
+                                    <?php if (isset($errors['password'])) : ?>
+                                        <p class="text-xs text-red-600 mt-2" id="name-error">
+                                            <?php echo $errors['password']; ?>
+                                        </p>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div>
