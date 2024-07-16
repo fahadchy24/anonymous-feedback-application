@@ -1,3 +1,6 @@
+<?php
+require "redirect.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 

@@ -1,3 +1,56 @@
+<?php
+session_start();
+
+require "helpers.php";
+
+$errors = [];
+
+$message = '';
+
+if (!isset($_SESSION['feedback_url'])) {
+    header('Location:index.php');
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Validate and Sanitize Email Field
+    if (empty($_POST['feedback'])) {
+        $errors['error'] = 'Please provide a message.';
+    } else {
+        $feedback = sanitize($_POST['feedback']);
+    }
+
+    if (empty($errors)) {
+        $new_message = [
+            "feedback_url" => $_SESSION['feedback_url'],
+            "message" => $_POST['feedback']
+        ];
+
+        if (filesize("feedback.json") == 0) {
+            $first_record = array($new_message);
+            $data_to_save = $first_record;
+        } else {
+            $old_messages = json_decode(file_get_contents("feedback.json"));
+            array_push($old_messages, $new_message);
+            $data_to_save = $old_messages;
+        }
+
+        $encoded_data = json_encode($data_to_save, JSON_PRETTY_PRINT);
+
+        if (!file_put_contents("feedback.json", $encoded_data, LOCK_EX)) {
+            $errors['error'] = "Error storing message, please try again";
+        } else {
+            flash('success', 'Message is sent successfully.');
+        }
+    }
+}
+
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,6 +97,24 @@
             <img src="./images/beams.jpg" alt="" class="absolute top-1/2 left-1/2 max-w-none -translate-x-1/2 -translate-y-1/2" width="1308" />
             <div class="absolute inset-0 bg-[url(./images/grid.svg)] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
             <div class="relative bg-white px-6 pt-10 pb-8 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto sm:max-w-lg sm:rounded-lg sm:px-10">
+
+                <?php
+                $message = flash('success');
+                if ($message) :
+                ?>
+                    <div class="mt-2 bg-teal-500 text-sm text-white rounded-lg p-4" role="alert">
+                        <span class="font-bold">
+                            <?= $message; ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($errors['error'])) : ?>
+                    <div class="mt-2 bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
+                        <span class="font-bold"><?= $errors['error']; ?></span>
+                    </div>
+                <?php endif; ?>
+
                 <div class="mx-auto max-w-xl">
                     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                         <div class="mx-auto w-full max-w-xl text-center">
@@ -52,7 +123,7 @@
                         </div>
 
                         <div class="mt-10 mx-auto w-full max-w-xl">
-                            <form class="space-y-6" action="#" method="POST">
+                            <form class="space-y-6" action="" method="POST" novalidate>
                                 <div>
                                     <label for="feedback" class="block text-sm font-medium leading-6 text-gray-900">Don't hesitate, just do it!</label>
                                     <div class="mt-2">

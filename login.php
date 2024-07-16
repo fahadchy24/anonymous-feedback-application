@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user_id = $user_details[0];
                 $name = $user_details[1];
                 $email = $user_details[2];
+                $feedback_url = $user_details[4];
                 break;
             }
         }
@@ -35,11 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($success) {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['name'] = $name;
+            $_SESSION['feedback_url'] = $feedback_url;
             header('Location:dashboard.php');
             exit;
         } else {
             $errors['auth_error'] = 'Invalid email or password';
         }
+    } else {
+        $errors['auth_error'] = 'Something went wrong';
     }
 }
 
